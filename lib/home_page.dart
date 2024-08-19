@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mylistloginlogout/user_list.dart';
+import 'package:mylistloginlogout/JSON/users.dart';
 
 class HomePage extends StatelessWidget {
-  final UserList user;
+  final User user;
 
-  HomePage(this.user);
+  HomePage({required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -15,27 +15,38 @@ class HomePage extends StatelessWidget {
         title: Text('صفحه ورود'),
       ),
       body: Center(
-
-        child: Column(crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.center,
-
-                children: [
-        const Text(
-          'Welcome',
-          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(
-          height: 30,
-        ),
-        Text(
-          'Hello, ${user.username}! \n Your ID is ${user.id}.',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-                ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Hello  ${user.username}\n Welcome',
+              style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            Text(
+              'Your ID : ${user.userId}',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(15.0),
+                child: Text('خروج', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
               ),
+            ),
+          ],
+        ),
       ),
     );
   }

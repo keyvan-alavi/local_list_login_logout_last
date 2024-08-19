@@ -1,18 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mylistloginlogout/user_list.dart';
+import 'package:mylistloginlogout/DbHelper/db_helper.dart';
 import 'package:mylistloginlogout/widgets/colors.dart';
 import 'package:mylistloginlogout/widgets/textfields.dart';
 import 'package:mylistloginlogout/widgets/widgets.dart';
+import 'JSON/users.dart';
 import 'login_page.dart';
 
-class SignupPage extends StatelessWidget {
-  final DatabaseManagment _userManager;
-  SignupPage(this._userManager, {super.key});
+class SignupPage extends StatefulWidget {
 
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
 
   @override
@@ -73,14 +77,7 @@ class SignupPage extends StatelessWidget {
               controller: _usernameController,
             ),
           ),
-          /*Padding(
-            padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
-            child: TextFormFields(
-              suffixIcon: Icons.mail,
-              hintText: 'ایمیل',
-              controller: emailController,
-            ),
-          ),*/
+
           TextFormFields(
             suffixIcon: Icons.lock,
             hintText: 'رمز عبور(اجباری)',
@@ -92,7 +89,7 @@ class SignupPage extends StatelessWidget {
             child: TextFormFields(
               suffixIcon: Icons.lock,
               hintText: 'تکرار رمز عبور(اجباری)',
-              controller: _repasswordController,
+              controller: _confirmPasswordController,
               passwordcheck: true,
             ),
           ),
@@ -113,10 +110,27 @@ class SignupPage extends StatelessWidget {
         height: MediaQuery.of(context).size.height * 0.14,
         child: Column(
           children: [
-            GradientButton(context, () {
+            GradientButton(context, () async {
               final username = _usernameController.text;
               final password = _passwordController.text;
-              _userManager.addUser(username, password);
+              final confirmPassword = _confirmPasswordController.text;
+
+              if (username.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('هیچ فیلدی خالی نباشد')),
+                );
+                return;
+              }
+
+              if (password != confirmPassword) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('عدم تطابق رمز عبور و تکرار رمز')),
+                );
+                return;
+              }
+
+              final user = User(username: username, password: password);
+              await DatabaseHelper().addUsers(user);
               Navigator.pop(context);
             }, "عضویت"),
             Row(

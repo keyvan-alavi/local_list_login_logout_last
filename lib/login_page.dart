@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mylistloginlogout/register_page.dart';
-import 'package:mylistloginlogout/user_list.dart';
 import 'package:mylistloginlogout/widgets/colors.dart';
 import 'package:mylistloginlogout/widgets/textfields.dart';
 import 'package:mylistloginlogout/widgets/widgets.dart';
-
+import 'DbHelper/db_helper.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final DatabaseManagment _userManager = DatabaseManagment();
+
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +37,14 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget headerUi(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.32,
     );
   }
 
   Widget mainUi(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height * 0.53,
       child: Column(
@@ -102,25 +101,34 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget footerUi(BuildContext context) {
-    return Container(
+    return SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height * 0.15,
         child: Column(
           children: [
-            GradientButton(context, () {
+            GradientButton(context, () async{
               final username = _usernameController.text;
               final password = _passwordController.text;
-              final user = _userManager.userAuth(username, password);
-              if (user != null || username.isNotEmpty || password.isNotEmpty) {
+
+              if (username.isEmpty || password.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('هیچ فیلدی خالی نباشد')),
+                );
+                return;
+              }
+
+              final user = await DatabaseHelper().getUser(username, password);
+              if (user != null) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePage(user!)),
+                  MaterialPageRoute(builder: (context) => HomePage(user: user)),
                 );
-              } else if (user == null || username.isEmpty || password.isEmpty)  {
+              } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Invalid username or password')),
+                  const SnackBar(content: Text('نام کاربری یا رمز عبور اشتباه است')),
                 );
               }
+
             }, "ورود"),
             Row(
               mainAxisSize: MainAxisSize.max,
@@ -133,7 +141,7 @@ class LoginPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) {
-                            return SignupPage(_userManager);
+                            return SignupPage();
                           },
                         ),
                       );
